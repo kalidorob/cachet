@@ -1,7 +1,9 @@
 package cachet
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 const (
@@ -25,21 +27,44 @@ type ComponentsService struct {
 	client *Client
 }
 
+type Tags []string
+
+// For some bizarre reason, the Cachet API only accepts tags as a CSL.
+func (t *Tags) MarshalJSON() ([]byte, error) {
+	j := strings.Join(*t, ",")
+	return json.Marshal(j)
+}
+
+// But it returns tags as a map. Because? Who knows.
+func (t *Tags) UnmarshalJSON(data []byte) error {
+	var s map[string]string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+	var v string
+	for _, v = range s {
+		*t = append(*t, v)
+
+	}
+	return nil
+}
+
 // Component entity reflects one single component
 type Component struct {
-	ID          int      `json:"id,omitempty"`
-	Name        string   `json:"name,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Link        string   `json:"link,omitempty"`
-	Status      int      `json:"status,omitempty"`
-	Order       int      `json:"order,omitempty"`
-	Enabled     bool     `json:"enabled,omitempty"`
-	GroupID     int      `json:"group_id,omitempty"`
-	CreatedAt   string   `json:"created_at,omitempty"`
-	UpdatedAt   string   `json:"updated_at,omitempty"`
-	DeletedAt   string   `json:"deleted_at,omitempty"`
-	StatusName  string   `json:"status_name,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
+	ID          int    `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	Link        string `json:"link,omitempty"`
+	Status      int    `json:"status,omitempty"`
+	Order       int    `json:"order,omitempty"`
+	Enabled     bool   `json:"enabled,omitempty"`
+	GroupID     int    `json:"group_id,omitempty"`
+	CreatedAt   string `json:"created_at,omitempty"`
+	UpdatedAt   string `json:"updated_at,omitempty"`
+	DeletedAt   string `json:"deleted_at,omitempty"`
+	StatusName  string `json:"status_name,omitempty"`
+	Tags        Tags   `json:"tags,omitempty"`
 }
 
 // ComponentResponse reflects the response of /components call
