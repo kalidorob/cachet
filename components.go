@@ -37,15 +37,19 @@ func (t *Tags) MarshalJSON() ([]byte, error) {
 
 // But it returns tags as a map. Because? Who knows.
 func (t *Tags) UnmarshalJSON(data []byte) error {
+	// I have no idea why it sometimes returns tags as `[]` either.
+	if string(data) == "[]" {
+		*t = []string{}
+		return nil
+	}
 	var s map[string]string
 	err := json.Unmarshal(data, &s)
 	if err != nil {
 		return err
 	}
-	var v string
-	for _, v = range s {
+	// `{"slug":"tag value"}` is a very sensible list format. YES.
+	for _, v := range s {
 		*t = append(*t, v)
-
 	}
 	return nil
 }
@@ -58,7 +62,7 @@ type Component struct {
 	Link        string `json:"link,omitempty"`
 	Status      int    `json:"status,omitempty"`
 	Order       int    `json:"order,omitempty"`
-	Enabled     bool   `json:"enabled,omitempty"`
+	Enabled     bool   `json:"enabled"`
 	GroupID     int    `json:"group_id,omitempty"`
 	CreatedAt   string `json:"created_at,omitempty"`
 	UpdatedAt   string `json:"updated_at,omitempty"`
