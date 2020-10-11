@@ -3,7 +3,7 @@ package cachet_test
 import (
 	"fmt"
 
-	"github.com/andygrunwald/cachet"
+	"github.com/kalidorob/cachet"
 )
 
 func ExampleGeneralService_Ping() {
